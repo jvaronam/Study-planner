@@ -1,0 +1,58 @@
+// auth.ts
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
+
+const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
+
+if (!secret) {
+  throw new Error("AUTH_SECRET or NEXTAUTH_SECRET is not set");
+}
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret, // ← IMPORTANTÍSIMO
+  session: {
+    strategy: "jwt",
+  },
+  providers: [
+    Credentials({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        const email = credentials?.email as string | undefined;
+        const password = credentials?.password as string | undefined;
+
+        if (!email || !password) {
+          return null;
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { email },
+        });
+
+        if (!user) {
+          return null;
+        }
+
+        const isValid = await bcrypt.compare(password, user.passwordHash);
+
+        if (!isValid) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        };
+      },
+    }),
+  ],
+  pages: {
+    signIn: "/login",
+  },
+});

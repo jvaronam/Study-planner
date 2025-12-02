@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Study Planner
 
-## Getting Started
+Final project for the **Web Programming** course.
 
-First, run the development server:
+A small study planner for students where each user can:
+
+- Sign up and log in.
+- Create and manage **subjects**.
+- Add **tasks** (exams, assignments, projects, study sessions) to each subject.
+- Mark tasks as completed / pending.
+- See a dashboard with an overview of their study plan.
+
+## Tech stack
+
+- **Next.js 16** (App Router)
+- **TypeScript**
+- **Tailwind CSS**
+- **Auth.js / NextAuth** (credentials provider)
+- **PostgreSQL** (Docker)
+- **Prisma** as ORM
+
+---
+
+## Features
+
+### Authentication
+
+- User sign-up at `/signup`.
+- Login with email and password at `/login`.
+- Passwords are hashed with **bcrypt**.
+- Protected routes:
+  - `/dashboard`
+  - `/subjects`
+  - `/subjects/[id]`
+- If the user is not authenticated, they are redirected to `/login`.
+
+### Subjects
+
+Each user can manage their own subjects:
+
+- Create new subjects (name, semester, credits, difficulty).
+- List their subjects at `/subjects`.
+- Delete subjects (and all their tasks).
+- Navigate to a subject detail page at `/subjects/[id]`.
+
+### Tasks
+
+For each subject, the user can manage tasks:
+
+- Create tasks with:
+  - title (required)
+  - description (optional)
+  - type (`EXAM`, `ASSIGNMENT`, `PROJECT`, `STUDY`)
+  - due date (optional)
+  - grade (optional)
+- List tasks in the subject detail page.
+- Mark tasks as **completed** / **pending**.
+- Delete tasks.
+
+### Dashboard
+
+At `/dashboard` the user can see:
+
+- Total number of subjects.
+- Total number of pending tasks.
+- A list of the next pending tasks (with subject, type and due date).
+- Quick links to:
+  - manage subjects
+  - open a subject to add tasks
+- Button to log out.
+
+---
+
+## Database
+
+The database is a local **PostgreSQL** instance running in Docker.
+
+### 1. Start PostgreSQL with Docker
+
+From the project root:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+sudo docker-compose up -d
